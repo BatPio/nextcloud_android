@@ -40,6 +40,7 @@ public class SyncedFolder implements Serializable, Cloneable {
     private boolean chargingOnly;
     private boolean existing;
     private boolean subfolderByDate;
+    private String delayConfig;
     private String account;
     private int uploadAction;
     private int nameCollisionPolicy;
@@ -71,6 +72,7 @@ public class SyncedFolder implements Serializable, Cloneable {
                         boolean chargingOnly,
                         boolean existing,
                         boolean subfolderByDate,
+                        String delayConfig,
                         String account,
                         int uploadAction,
                         int nameCollisionPolicy,
@@ -85,6 +87,7 @@ public class SyncedFolder implements Serializable, Cloneable {
              chargingOnly,
              existing,
              subfolderByDate,
+             delayConfig,
              account,
              uploadAction,
              nameCollisionPolicy,
@@ -106,6 +109,7 @@ public class SyncedFolder implements Serializable, Cloneable {
                            boolean chargingOnly,
                            boolean existing,
                            boolean subfolderByDate,
+                           String delayConfig,
                            String account,
                            int uploadAction,
                            int nameCollisionPolicy,
@@ -120,6 +124,7 @@ public class SyncedFolder implements Serializable, Cloneable {
         this.chargingOnly = chargingOnly;
         this.existing = existing;
         this.subfolderByDate = subfolderByDate;
+        this.delayConfig = delayConfig;
         this.account = account;
         this.uploadAction = uploadAction;
         this.nameCollisionPolicy = nameCollisionPolicy;
@@ -170,6 +175,14 @@ public class SyncedFolder implements Serializable, Cloneable {
 
     public boolean isSubfolderByDate() {
         return this.subfolderByDate;
+    }
+
+    public String getDelayConfigString() {
+        return delayConfig;
+    }
+
+    public SyncDelay getDelayConfig() {
+        return SyncDelay.deserialize(delayConfig);
     }
 
     public String getAccount() {
@@ -226,6 +239,10 @@ public class SyncedFolder implements Serializable, Cloneable {
 
     public void setExisting(boolean existing) {
         this.existing = existing;
+    }
+
+    public void setDelayConfig(String delayConfig) {
+        this.delayConfig = delayConfig;
     }
 
     public void setSubfolderByDate(boolean subfolderByDate) {

@@ -147,7 +147,9 @@ class FilesSyncWork(
             return
         }
 
-        val pathsAndMimes = paths.map { path ->
+        val pathFilter = prepareFilter(syncedFolder)
+
+        val pathsAndMimes = paths.filter{ path -> pathFilter.invoke(path) }.map { path ->
             file = File(path)
             val localPath = file.absolutePath
             Triple(
@@ -258,6 +260,13 @@ class FilesSyncWork(
             "LOCAL_BEHAVIOUR_MOVE" -> FileUploader.LOCAL_BEHAVIOUR_MOVE
             "LOCAL_BEHAVIOUR_DELETE" -> FileUploader.LOCAL_BEHAVIOUR_DELETE
             else -> FileUploader.LOCAL_BEHAVIOUR_FORGET
+        }
+    }
+
+    private fun prepareFilter(syncedFolder: SyncedFolder): (String) -> Boolean {
+        return when (syncedFolder.delayConfigString != null) {
+            true -> { path: String -> syncedFolder.delayConfig.satisfies(File(path).lastModified()) }
+            false -> { _ -> true }
         }
     }
 }

@@ -24,6 +24,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.owncloud.android.datamodel.MediaFolderType;
+import com.owncloud.android.datamodel.SyncDelay;
 import com.owncloud.android.datamodel.SyncedFolderDisplayItem;
 import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.files.services.NameCollisionPolicy;
@@ -47,6 +48,7 @@ public class SyncedFolderParcelable implements Parcelable {
     private long id;
     private String account;
     private int section;
+    private SyncDelay syncDelay;
 
     public SyncedFolderParcelable(SyncedFolderDisplayItem syncedFolderDisplayItem, int section) {
         id = syncedFolderDisplayItem.getId();
@@ -83,6 +85,7 @@ public class SyncedFolderParcelable implements Parcelable {
         nameCollisionPolicy = NameCollisionPolicy.deserialize(read.readInt());
         section = read.readInt();
         hidden = read.readInt() != 0;
+        syncDelay = SyncDelay.deserialize(read.readString());
     }
 
     public SyncedFolderParcelable() {
@@ -106,6 +109,7 @@ public class SyncedFolderParcelable implements Parcelable {
         dest.writeInt(nameCollisionPolicy.serialize());
         dest.writeInt(section);
         dest.writeInt(hidden ? 1 : 0);
+        dest.writeString(syncDelay.serialize());
     }
 
     public static final Creator<SyncedFolderParcelable> CREATOR =
@@ -188,6 +192,10 @@ public class SyncedFolderParcelable implements Parcelable {
         return this.subfolderByDate;
     }
 
+    public SyncDelay getSyncDelay() {
+        return syncDelay;
+    }
+
     public Integer getUploadAction() {
         return this.uploadAction;
     }
@@ -246,6 +254,10 @@ public class SyncedFolderParcelable implements Parcelable {
 
     public void setSubfolderByDate(boolean subfolderByDate) {
         this.subfolderByDate = subfolderByDate;
+    }
+
+    public void setSyncDelay(SyncDelay syncDelay) {
+        this.syncDelay = syncDelay;
     }
 
     public void setNameCollisionPolicy(NameCollisionPolicy nameCollisionPolicy) {
