@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ProviderMeta {
     public static final String DB_NAME = "filelist";
-    public static final int DB_VERSION = 65;
+    public static final int DB_VERSION = 66;
 
     private ProviderMeta() {
         // No instance
@@ -282,10 +282,10 @@ public class ProviderMeta {
         public static final String SYNCED_FOLDER_ENABLED_TIMESTAMP_MS = "enabled_timestamp_ms";
         public static final String SYNCED_FOLDER_TYPE = "type";
         public static final String SYNCED_FOLDER_SUBFOLDER_BY_DATE = "subfolder_by_date";
-        public static final String SYNCED_FOLDER_DELAY_CONFIG = "delayConfig";
         public static final String SYNCED_FOLDER_ACCOUNT = "account";
         public static final String SYNCED_FOLDER_UPLOAD_ACTION = "upload_option";
         public static final String SYNCED_FOLDER_NAME_COLLISION_POLICY = "name_collision_policy";
+        public static final String SYNCED_FOLDER_UPLOAD_DELAY_TIME_MS = "upload_delay_time_ms";
         public static final String SYNCED_FOLDER_HIDDEN = "hidden";
 
         // Columns of external links table

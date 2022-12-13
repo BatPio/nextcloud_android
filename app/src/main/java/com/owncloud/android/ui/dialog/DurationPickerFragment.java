@@ -142,17 +142,15 @@ public class DurationPickerFragment extends DialogFragment {
                 .setPositiveButton("Ok",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                Listener activity = (Listener) getActivity();
                                 updateResult();
-                                activity.onDurationPickerResult(Activity.RESULT_OK, TimeUnit.DAYS.toMillis(days) +  TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes));
+                                mListener.onDurationPickerResult(Activity.RESULT_OK, TimeUnit.DAYS.toMillis(days) +  TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes));
                             }
                         }
                 )
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        Listener activity = (Listener) getActivity();
                         updateResult();
-                        activity.onDurationPickerResult(Activity.RESULT_CANCELED, TimeUnit.DAYS.toMillis(days) +  TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes));
+                        mListener.onDurationPickerResult(Activity.RESULT_CANCELED, TimeUnit.DAYS.toMillis(days) +  TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes));
                     }
                 });
                 return builder.create();

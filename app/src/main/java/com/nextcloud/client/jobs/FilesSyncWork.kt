@@ -140,16 +140,15 @@ class FilesSyncWork(
         }
         val paths = filesystemDataProvider.getFilesForUpload(
             syncedFolder.localPath,
-            syncedFolder.id.toString()
+            syncedFolder.id.toString(),
+            syncedFolder.uploadDelayTimeMs
         )
 
         if (paths.size == 0) {
             return
         }
 
-        val pathFilter = prepareFilter(syncedFolder)
-
-        val pathsAndMimes = paths.filter{ path -> pathFilter.invoke(path) }.map { path ->
+        val pathsAndMimes = paths.map { path ->
             file = File(path)
             val localPath = file.absolutePath
             Triple(
@@ -263,10 +262,4 @@ class FilesSyncWork(
         }
     }
 
-    private fun prepareFilter(syncedFolder: SyncedFolder): (String) -> Boolean {
-        return when (syncedFolder.delayConfigString != null) {
-            true -> { path: String -> syncedFolder.delayConfig.satisfies(File(path).lastModified()) }
-            false -> { _ -> true }
-        }
-    }
 }

@@ -24,7 +24,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.owncloud.android.datamodel.MediaFolderType;
-import com.owncloud.android.datamodel.SyncDelay;
 import com.owncloud.android.datamodel.SyncedFolderDisplayItem;
 import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.files.services.NameCollisionPolicy;
@@ -48,7 +47,7 @@ public class SyncedFolderParcelable implements Parcelable {
     private long id;
     private String account;
     private int section;
-    private SyncDelay syncDelay;
+    private long uploadDelayTimeMs;
 
     public SyncedFolderParcelable(SyncedFolderDisplayItem syncedFolderDisplayItem, int section) {
         id = syncedFolderDisplayItem.getId();
@@ -85,7 +84,7 @@ public class SyncedFolderParcelable implements Parcelable {
         nameCollisionPolicy = NameCollisionPolicy.deserialize(read.readInt());
         section = read.readInt();
         hidden = read.readInt() != 0;
-        syncDelay = SyncDelay.deserialize(read.readString());
+        uploadDelayTimeMs = read.readLong();
     }
 
     public SyncedFolderParcelable() {
@@ -109,7 +108,7 @@ public class SyncedFolderParcelable implements Parcelable {
         dest.writeInt(nameCollisionPolicy.serialize());
         dest.writeInt(section);
         dest.writeInt(hidden ? 1 : 0);
-        dest.writeString(syncDelay != null ? syncDelay.serialize(): null);//leci null przy zapisie
+        dest.writeLong(uploadDelayTimeMs);
     }
 
     public static final Creator<SyncedFolderParcelable> CREATOR =
@@ -192,8 +191,8 @@ public class SyncedFolderParcelable implements Parcelable {
         return this.subfolderByDate;
     }
 
-    public SyncDelay getSyncDelay() {
-        return syncDelay;
+    public long getUploadDelayTimeMs() {
+        return uploadDelayTimeMs;
     }
 
     public Integer getUploadAction() {
@@ -256,8 +255,8 @@ public class SyncedFolderParcelable implements Parcelable {
         this.subfolderByDate = subfolderByDate;
     }
 
-    public void setSyncDelay(SyncDelay syncDelay) {
-        this.syncDelay = syncDelay;
+    public void setUploadDelayTimeMs(long uploadDelayTimeMs) {
+        this.uploadDelayTimeMs = uploadDelayTimeMs;
     }
 
     public void setNameCollisionPolicy(NameCollisionPolicy nameCollisionPolicy) {

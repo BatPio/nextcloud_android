@@ -92,6 +92,7 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
     private TextView mLocalFolderPath;
     private TextView mLocalFolderSummary;
     private TextView mRemoteFolderSummary;
+    private TextView mUploadDelaySummary;
 
     private SyncedFolderParcelable mSyncedFolder;
     private MaterialButton mCancel;
@@ -191,6 +192,8 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
         mUploadBehaviorSummary = binding.settingInstantBehaviourSummary;
 
         mNameCollisionPolicySummary = binding.settingInstantNameCollisionPolicySummary;
+
+        mUploadDelaySummary = binding.settingInstantUploadDelaySummary;
 
         mCancel = binding.cancel;
         mSave = binding.save;
@@ -425,10 +428,18 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //showNameCollisionPolicyDialog();
-                    showDateFilterDialog();
+                    showNameCollisionPolicyDialog();
                 }
             });
+
+        binding.settingInstantUploadDelayContainer.setOnClickListener(
+            new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showUploadDelayDialog();
+                }
+            }
+        );
     }
 
     private void showBehaviourDialog() {
@@ -479,9 +490,19 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
         behaviourDialog.show();
     }
 
-    private void showDateFilterDialog() {
-        SyncedFolderDateFilterFragment dateFilterDialog = new SyncedFolderDateFilterFragment();
-        dateFilterDialog.show(getParentFragmentManager(), "Date filter");
+    private void showUploadDelayDialog() {
+        DurationPickerFragment dialog = new DurationPickerFragment();
+        dialog.setMetrics("d", "h", "m");
+        dialog.setListener(new DurationPickerFragment.Listener() {
+            @Override
+            public void onDurationPickerResult(int requestCode, long duration) {
+                mSyncedFolder.setUploadDelayTimeMs(duration);
+                mUploadDelaySummary.setText(String.valueOf(duration));
+                dialog.dismiss();
+
+            }
+        });
+        dialog.show(getParentFragmentManager(), "dialog");
     }
 
     @Override
