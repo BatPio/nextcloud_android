@@ -98,6 +98,7 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
     private MaterialButton mSave;
     private boolean behaviourDialogShown;
     private boolean nameCollisionPolicyDialogShown;
+    private boolean delayPreferencesDialogShown;
     private AlertDialog behaviourDialog;
     private SyncedFoldersSettingsLayoutBinding binding;
 
@@ -424,7 +425,8 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
             new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showNameCollisionPolicyDialog();
+                    //showNameCollisionPolicyDialog();
+                    showDateFilterDialog();
                 }
             });
     }
@@ -475,6 +477,11 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
 
         behaviourDialog = builder.create();
         behaviourDialog.show();
+    }
+
+    private void showDateFilterDialog() {
+        SyncedFolderDateFilterFragment dateFilterDialog = new SyncedFolderDateFilterFragment();
+        dateFilterDialog.show(getParentFragmentManager(), "Date filter");
     }
 
     @Override

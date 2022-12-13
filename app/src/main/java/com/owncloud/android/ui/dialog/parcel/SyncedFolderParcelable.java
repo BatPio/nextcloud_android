@@ -109,7 +109,7 @@ public class SyncedFolderParcelable implements Parcelable {
         dest.writeInt(nameCollisionPolicy.serialize());
         dest.writeInt(section);
         dest.writeInt(hidden ? 1 : 0);
-        dest.writeString(syncDelay.serialize());
+        dest.writeString(syncDelay != null ? syncDelay.serialize(): null);//leci null przy zapisie
     }
 
     public static final Creator<SyncedFolderParcelable> CREATOR =
