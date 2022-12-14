@@ -99,7 +99,6 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
     private MaterialButton mSave;
     private boolean behaviourDialogShown;
     private boolean nameCollisionPolicyDialogShown;
-    private boolean delayPreferencesDialogShown;
     private AlertDialog behaviourDialog;
     private SyncedFoldersSettingsLayoutBinding binding;
 
@@ -236,6 +235,8 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
         final int nameCollisionPolicyIndex =
             getSelectionIndexForNameCollisionPolicy(mSyncedFolder.getNameCollisionPolicy());
         mNameCollisionPolicySummary.setText(mNameCollisionPolicyItemStrings[nameCollisionPolicyIndex]);
+
+        mUploadDelaySummary.setText(String.valueOf(mSyncedFolder.getUploadDelayTimeMs()));
     }
 
     /**
@@ -491,13 +492,14 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
     }
 
     private void showUploadDelayDialog() {
-        DurationPickerFragment dialog = new DurationPickerFragment();
-        dialog.setMetrics("d", "h", "m");
+        DurationPickerFragment dialog = DurationPickerFragment.newInstance(mSyncedFolder.getUploadDelayTimeMs());
         dialog.setListener(new DurationPickerFragment.Listener() {
             @Override
-            public void onDurationPickerResult(int requestCode, long duration) {
-                mSyncedFolder.setUploadDelayTimeMs(duration);
-                mUploadDelaySummary.setText(String.valueOf(duration));
+            public void onDurationPickerResult(int resultCode, long duration) {
+                if (resultCode == Activity.RESULT_OK) {
+                    mSyncedFolder.setUploadDelayTimeMs(duration);
+                    mUploadDelaySummary.setText(String.valueOf(duration));
+                }
                 dialog.dismiss();
 
             }

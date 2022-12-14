@@ -6,45 +6,50 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.nextcloud.client.di.Injectable;
 import com.owncloud.android.R;
+import com.owncloud.android.databinding.DurationPickerBinding;
+import com.owncloud.android.databinding.SyncedFoldersSettingsLayoutBinding;
+import com.owncloud.android.datamodel.SyncedFolderDisplayItem;
+import com.owncloud.android.ui.dialog.parcel.SyncedFolderParcelable;
+import com.owncloud.android.utils.theme.ViewThemeUtils;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
-/**
- * Created by Mikael on 02/02/16.
- * https://github.com/Mioh/DurationPicker
- */
+public class DurationPickerFragment extends DialogFragment implements Injectable {
 
-public class DurationPickerFragment extends DialogFragment {
-    private int days = 0;
-    private int hours = 0;
-    private int minutes = 0;
-    private TextView r0;
-    private TextView r1;
-    private TextView r2;
-    private TextView r3;
-    private TextView r4;
-    private TextView r5;
-    private String mMetric54 = "s";
-    private String mMetric32 = "m";
-    private String mMetric10 = "h";
+    public static final String DURATION = "duration";
+
+    @Inject ViewThemeUtils viewThemeUtils;
+
+    private NumberPicker daysPicker;
+    private NumberPicker hoursPicker;
+    private NumberPicker minutesPicker;
+
+    private DurationPickerBinding binding;
 
     public Listener mListener;
 
-    // Empty constructor required for DialogFragment
-    public DurationPickerFragment() {
+    public static DurationPickerFragment newInstance(long duration) {
+        Bundle args = new Bundle();
+        args.putLong(DURATION, duration);
 
-    }
+        DurationPickerFragment dialogFragment = new DurationPickerFragment();
+        dialogFragment.setArguments(args);
+        dialogFragment.setStyle(STYLE_NORMAL, R.style.Theme_ownCloud_Dialog);
 
-    public void setMetrics(String metric54, String metric32, String metric10) {
-        mMetric54 = metric54;
-        mMetric32 = metric32;
-        mMetric10 = metric10;
+        return dialogFragment;
     }
 
     public void setListener(Listener listener) {
@@ -52,107 +57,88 @@ public class DurationPickerFragment extends DialogFragment {
     }
 
     interface Listener {
-        void onDurationPickerResult(int requestCode, long duration);
+        void onDurationPickerResult(int resultCode, long duration);
     }
 
-    private void leftShiftResultDigits(CharSequence value) {
-        r5.setText(r4.getText());
-        r4.setText(r3.getText());
-        r3.setText(r2.getText());
-        r2.setText(r1.getText());
-        r1.setText(r0.getText());
-        r0.setText(value);
-    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // keep the state of the fragment on configuration changes
+        setRetainInstance(true);
 
-    private void rightShiftResultDigits(CharSequence value) {
-        r0.setText(r1.getText());
-        r1.setText(r2.getText());
-        r2.setText(r3.getText());
-        r3.setText(r4.getText());
-        r4.setText(r5.getText());
-        r5.setText(value);
-    }
-
-    private void updateResult() {
-        days = Integer.valueOf(r5.getText().toString() + r4.getText());
-        hours = Integer.valueOf(r3.getText().toString() + r2.getText());
-        minutes = Integer.valueOf(r1.getText().toString() + r0.getText());
+        binding = null;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        binding = DurationPickerBinding.inflate(requireActivity().getLayoutInflater(), null, false);
 
-        View view = getActivity().getLayoutInflater().inflate(R.layout.duration_picker, null);
+        daysPicker = binding.daysPicker;
+        hoursPicker = binding.hoursPicker;
+        minutesPicker = binding.minutesPicker;
 
-        r0 = (TextView) view.findViewById(R.id.result_0);
-        r1 = (TextView) view.findViewById(R.id.result_1);
-        r2 = (TextView) view.findViewById(R.id.result_2);
-        r3 = (TextView) view.findViewById(R.id.result_3);
-        r4 = (TextView) view.findViewById(R.id.result_4);
-        r5 = (TextView) view.findViewById(R.id.result_5);
+        daysPicker.setMaxValue(30);
+        hoursPicker.setMaxValue(24);
+        minutesPicker.setMaxValue(59);
 
-        r0.setText("0");
-        r1.setText("0");
-        r2.setText("0");
-        r3.setText("0");
-        r4.setText("0");
-        r5.setText("0");
+        long duration = requireArguments().getLong(DURATION);
+        setDuration(duration);
 
-        TextView metricView54 = (TextView) view.findViewById(R.id.metric_5_4);
-        TextView metricView32 = (TextView) view.findViewById(R.id.metric_3_2);
-        TextView metricView10 = (TextView) view.findViewById(R.id.metric_1_0);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(binding.getRoot().getContext());
+        builder.setView(binding.getRoot());
+        builder.setPositiveButton(R.string.common_save, (dialog, whichButton) -> mListener.onDurationPickerResult(Activity.RESULT_OK, getDuration()));
+        builder.setNegativeButton(R.string.common_cancel, (dialog, whichButton) -> mListener.onDurationPickerResult(Activity.RESULT_CANCELED, 0));
 
-        metricView54.setText(mMetric54);
-        metricView32.setText(mMetric32);
-        metricView10.setText(mMetric10);
+        viewThemeUtils.dialog.colorMaterialAlertDialogBackground(binding.getRoot().getContext(), builder);
 
+        AlertDialog dialog = builder.create();
+        //viewThemeUtils.platform.colorTextButtons(dialog.getButton(AlertDialog.BUTTON_POSITIVE));
+        //viewThemeUtils.platform.colorTextButtons(dialog.getButton(AlertDialog.BUTTON_NEGATIVE));
+        return dialog;
+    }
 
-        View.OnClickListener keypadListener = new View.OnClickListener() {
+    private long getDuration() {
+        return TimeUnit.DAYS.toMillis(daysPicker.getValue()) +
+            TimeUnit.HOURS.toMillis(hoursPicker.getValue()) +
+            TimeUnit.MINUTES.toMillis(minutesPicker.getValue());
+    }
 
-            @Override
-            public void onClick(View v) {
-                leftShiftResultDigits(((Button) v).getText());
-            }
-        };
+    private void setDuration(long duration) {
+        DurationComponents durationComponents = decomposeDuration(duration);
+        daysPicker.setValue(durationComponents.getDays());
+        hoursPicker.setValue(durationComponents.getHours());
+        minutesPicker.setValue(durationComponents.getMinutes());
+    }
 
-        view.findViewById(R.id.button_0).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_1).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_2).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_3).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_4).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_5).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_6).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_7).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_8).setOnClickListener(keypadListener);
-        view.findViewById(R.id.button_9).setOnClickListener(keypadListener);
-
-        View.OnClickListener backspaceListener = new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                rightShiftResultDigits("0");
-            }
-        };
-
-        view.findViewById(R.id.button_backspace).setOnClickListener(backspaceListener);
+    private DurationComponents decomposeDuration(long duration) {
+        int days = (int) TimeUnit.MILLISECONDS.toDays(duration);
+        int hours = (int) TimeUnit.MILLISECONDS.toHours(duration) - (days * 24);
+        int minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(duration) - (TimeUnit.MILLISECONDS.toHours(duration)* 60));
+        return new DurationComponents(days, hours, minutes);
+    }
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setView(view)
-                .setPositiveButton("Ok",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                updateResult();
-                                mListener.onDurationPickerResult(Activity.RESULT_OK, TimeUnit.DAYS.toMillis(days) +  TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes));
-                            }
-                        }
-                )
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        updateResult();
-                        mListener.onDurationPickerResult(Activity.RESULT_CANCELED, TimeUnit.DAYS.toMillis(days) +  TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes));
-                    }
-                });
-                return builder.create();
+    private class DurationComponents {
+        int days;
+        int hours;
+        int minutes;
+
+        public DurationComponents(int days, int hours, int minutes) {
+            this.days = days;
+            this.hours = hours;
+            this.minutes = minutes;
+        }
+
+        public int getDays() {
+            return days;
+        }
+
+        public int getHours() {
+            return hours;
+        }
+
+        public int getMinutes() {
+            return minutes;
+        }
     }
 }

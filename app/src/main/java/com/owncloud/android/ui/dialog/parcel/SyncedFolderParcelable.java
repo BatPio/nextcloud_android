@@ -64,6 +64,7 @@ public class SyncedFolderParcelable implements Parcelable {
         uploadAction = syncedFolderDisplayItem.getUploadAction();
         nameCollisionPolicy = NameCollisionPolicy.deserialize(
             syncedFolderDisplayItem.getNameCollisionPolicyInt());
+        uploadDelayTimeMs = syncedFolderDisplayItem.getUploadDelayTimeMs();
         this.section = section;
         hidden = syncedFolderDisplayItem.isHidden();
     }

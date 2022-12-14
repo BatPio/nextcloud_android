@@ -678,6 +678,7 @@ class SyncedFoldersActivity :
                 syncedFolder.isSubfolderByDate,
                 syncedFolder.uploadAction,
                 syncedFolder.nameCollisionPolicy.serialize(),
+                syncedFolder.uploadDelayTimeMs,
                 syncedFolder.isEnabled
             )
             saveOrUpdateSyncedFolder(item)
@@ -742,6 +743,7 @@ class SyncedFoldersActivity :
      * @param subfolderByDate created sub folders
      * @param uploadAction    upload action
      * @param nameCollisionPolicy what to do on name collision
+     * @param uploadDelayTimeMs delay
      * @param enabled         is sync enabled
      */
     @Suppress("LongParameterList")
@@ -756,6 +758,7 @@ class SyncedFoldersActivity :
         subfolderByDate: Boolean,
         uploadAction: Int,
         nameCollisionPolicy: Int,
+        uploadDelayTimeMs: Long,
         enabled: Boolean
     ) {
         item.id = id
@@ -767,6 +770,7 @@ class SyncedFoldersActivity :
         item.isSubfolderByDate = subfolderByDate
         item.uploadAction = uploadAction
         item.setNameCollisionPolicy(nameCollisionPolicy)
+        item.uploadDelayTimeMs = uploadDelayTimeMs
         item.setEnabled(enabled, clock.currentTime)
     }
 
