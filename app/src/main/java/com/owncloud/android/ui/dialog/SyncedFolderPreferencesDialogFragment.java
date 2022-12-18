@@ -46,6 +46,7 @@ import com.owncloud.android.ui.activity.UploadFilesActivity;
 import com.owncloud.android.ui.dialog.parcel.SyncedFolderParcelable;
 import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.FileStorageUtils;
+import com.owncloud.android.utils.TimeUtils;
 import com.owncloud.android.utils.theme.ViewThemeUtils;
 
 import java.io.File;
@@ -236,7 +237,7 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
             getSelectionIndexForNameCollisionPolicy(mSyncedFolder.getNameCollisionPolicy());
         mNameCollisionPolicySummary.setText(mNameCollisionPolicyItemStrings[nameCollisionPolicyIndex]);
 
-        mUploadDelaySummary.setText(String.valueOf(mSyncedFolder.getUploadDelayTimeMs()));
+        mUploadDelaySummary.setText(getDelaySummary(mSyncedFolder.getUploadDelayTimeMs()));
     }
 
     /**
@@ -492,16 +493,19 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
     }
 
     private void showUploadDelayDialog() {
-        DurationPickerFragment dialog = DurationPickerFragment.newInstance(mSyncedFolder.getUploadDelayTimeMs());
-        dialog.setListener(new DurationPickerFragment.Listener() {
+        DurationPickerDialogFragment dialog = DurationPickerDialogFragment.newInstance(
+            mSyncedFolder.getUploadDelayTimeMs(),
+            getString(R.string.pref_instant_upload_delay_dialogTitle),
+            getString(R.string.pref_instant_upload_delay_hint));
+
+        dialog.setListener(new DurationPickerDialogFragment.Listener() {
             @Override
             public void onDurationPickerResult(int resultCode, long duration) {
                 if (resultCode == Activity.RESULT_OK) {
                     mSyncedFolder.setUploadDelayTimeMs(duration);
-                    mUploadDelaySummary.setText(String.valueOf(duration));
+                    mUploadDelaySummary.setText(getDelaySummary(duration));
                 }
                 dialog.dismiss();
-
             }
         });
         dialog.show(getParentFragmentManager(), "dialog");
@@ -644,5 +648,28 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
             default:
                 return NameCollisionPolicy.ASK_USER;
         }
+    }
+
+    private String getDelaySummary(long duration) {
+        if (duration == 0) {
+            return getString(R.string.pref_instant_upload_delay_disabled);
+        }
+        TimeUtils.DurationParts durationParts = TimeUtils.getDurationParts(duration);
+        StringBuilder durationSummary = new StringBuilder();
+        if (durationParts.getDays() > 0) {
+            durationSummary.append(durationParts.getDays());
+            durationSummary.append(getString(R.string.common_days_short));
+            durationSummary.append(" ");
+        }
+        if (durationParts.getHours() > 0) {
+            durationSummary.append(durationParts.getHours());
+            durationSummary.append(getString(R.string.common_hours_short));
+            durationSummary.append(" ");
+        }
+        if (durationParts.getMinutes() > 0) {
+            durationSummary.append(durationParts.getMinutes());
+            durationSummary.append(getString(R.string.common_minutes_short));
+        }
+        return getString(R.string.pref_instant_upload_delay_enabled, durationSummary.toString().trim());
     }
 }
