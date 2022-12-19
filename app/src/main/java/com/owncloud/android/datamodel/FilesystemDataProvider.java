@@ -79,7 +79,7 @@ public class FilesystemDataProvider {
 
         String likeParam = localPath + "%";
 
-        long olderThanParam = System.currentTimeMillis() / 1000 - uploadDelayTimeMs;
+        long olderThanParam = (System.currentTimeMillis() - uploadDelayTimeMs) / 1000;
 
         Cursor cursor = contentResolver.query(
                 ProviderMeta.ProviderTableMeta.CONTENT_URI_FILESYSTEM,

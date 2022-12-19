@@ -345,6 +345,9 @@ public class SyncedFolderPreferencesDialogFragment extends DialogFragment implem
         binding.settingInstantNameCollisionPolicyContainer.setEnabled(enable);
         binding.settingInstantNameCollisionPolicyContainer.setAlpha(alpha);
 
+        binding.settingInstantUploadDelayContainer.setEnabled(enable);
+        binding.settingInstantUploadDelayContainer.setAlpha(alpha);
+
         mUploadOnWifiCheckbox.setEnabled(enable);
         mUploadOnChargingCheckbox.setEnabled(enable);
         mUploadExistingCheckbox.setEnabled(enable);

@@ -75,11 +75,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/clear"
+        style="@style/OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="center_horizontal"
         android:text="@string/common_clear"
-        android:theme="@style/Button.Primary"
         app:cornerRadius="@dimen/button_corner_radius" />
 
 </LinearLayout>
